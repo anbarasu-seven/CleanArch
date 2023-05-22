@@ -1,0 +1,151 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-android-extensions'
+    id 'kotlin-kapt'
+    id 'kotlin-platform-android'
+    id 'dagger.hilt.android.plugin'
+    id 'kotlin-allopen'
+    id 'androidx.navigation.safeargs.kotlin'
+}
+
+allOpen {
+    // allows mocking for classes w/o directly opening them for release builds
+    annotation 'com.tstl.dukan.testing.OpenClass'
+}
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion buildToolsVersion
+
+    defaultConfig {
+        applicationId 'com.tstl.dukan'
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        vectorDrawables.useSupportLibrary = true
+        testInstrumentationRunner "com.tstl.dukan.util.GithubTestRunner"
+    }
+    buildFeatures {
+        //viewBinding = true
+        dataBinding = true
+    }
+    buildTypes {
+        debug {
+            testCoverageEnabled !project.hasProperty('android.injected.invoked.from.ide')
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    kapt {
+        correctErrorTypes = true
+    }
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
+    }
+    flavorDimensions "default"
+    productFlavors {
+        dev {
+            dimension = 'default'
+            applicationIdSuffix = ".dev"
+        }
+        prod {
+            dimension = 'default'
+        }
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    configurations.all {
+        resolutionStrategy {
+            exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+
+        }
+    }
+    defaultConfig {
+        testInstrumentationRunnerArguments clearPackageData: 'true'
+    }
+    sourceSets {
+        androidTest.java.srcDirs += "src/test-common/java"
+        test.java.srcDirs += "src/test-common/java"
+    }
+    lintOptions {
+        lintConfig rootProject.file('lint.xml')
+        disable 'InvalidPackage'
+    }
+
+}
+
+dependencies {
+    implementation deps.app_compat
+    implementation deps.recyclerview
+    implementation deps.cardview
+    implementation deps.material
+    implementation deps.core_ktx
+    implementation deps.transition
+
+    implementation deps.fragment.testing
+    implementation deps.atsl.core
+    implementation deps.okhttp_logging_interceptor
+
+    implementation deps.navigation.fragment_ktx
+    implementation deps.room.runtime
+    implementation deps.lifecycle.livedata_ktx
+    implementation deps.lifecycle.runtime
+    implementation deps.lifecycle.java8
+    implementation deps.retrofit.runtime
+    implementation deps.retrofit.gson
+    implementation deps.retrofit.mock
+    implementation deps.retrofit.converter_moshi
+    implementation deps.retrofit.moshi
+    implementation deps.glide.runtime
+
+    //implementation deps.dagger.runtime
+    //implementation deps.dagger.android
+    //implementation deps.dagger.android_support
+    implementation deps.constraint_layout
+    implementation deps.kotlin.stdlib
+
+    // Hilt
+    implementation deps.hilt.android
+    kapt deps.hilt.kapt
+    androidTestImplementation deps.hilt.android_testing
+    kapt deps.hilt.android_compiler
+    kapt deps.hilt.androidx_compiler
+
+    implementation deps.timber
+
+    //kapt deps.dagger.android_support_compiler
+    //kapt deps.dagger.compiler
+    kapt deps.room.compiler
+    kapt deps.lifecycle.compiler
+
+    testImplementation deps.atsl.core
+    testImplementation deps.junit
+    testImplementation deps.mock_web_server
+    testImplementation deps.arch_core.testing
+    testImplementation deps.mockito.core
+
+    androidTestImplementation deps.atsl.core
+    androidTestImplementation deps.atsl.ext_junit
+    androidTestImplementation deps.atsl.runner
+    androidTestImplementation deps.atsl.rules
+
+    androidTestImplementation deps.app_compat
+    androidTestImplementation deps.recyclerview
+    androidTestImplementation deps.cardview
+    androidTestImplementation deps.material
+
+    androidTestImplementation deps.espresso.core
+    androidTestImplementation deps.espresso.contrib
+
+    androidTestImplementation deps.arch_core.testing
+    androidTestImplementation deps.mockito.core
+    androidTestImplementation deps.mockito.android
+}
+kapt {
+    correctErrorTypes true
+}
